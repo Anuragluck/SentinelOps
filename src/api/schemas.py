@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from enum import StrEnum
+import re
 from typing import Any
 from uuid import uuid4
 
@@ -32,6 +33,20 @@ class AlertInput(BaseModel):
         value = value.strip()
         if not value:
             raise ValueError("must not be blank")
+        return value
+
+    @field_validator("service")
+    @classmethod
+    def validate_service_identifier(cls, value: str) -> str:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", value):
+            raise ValueError("service must be a valid service identifier")
+        return value
+
+    @field_validator("environment")
+    @classmethod
+    def validate_environment_identifier(cls, value: str) -> str:
+        if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", value):
+            raise ValueError("environment must be a valid environment identifier")
         return value
 
 
@@ -68,7 +83,7 @@ class TraceSummary(BaseModel):
     model: str
     input_tokens: int = 0
     output_tokens: int = 0
-    estimated_cost_usd: float = 0
+    estimated_cost_usd: float | None = 0
 
 
 class TriageResponse(BaseModel):

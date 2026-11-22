@@ -3,6 +3,8 @@
 ## Symptoms
 HTTP 504 upstream gateway timeout after deployment. Alert codes may include `HTTP_504_GATEWAY`.
 
+Synthetic incident fingerprint: `INC_PAYMENTS_API_HTTP_504_GATEWAY_034`.
+
 ## Root cause
 Cause: A slow upstream dependency caused gateway timeouts after the deployment.
 

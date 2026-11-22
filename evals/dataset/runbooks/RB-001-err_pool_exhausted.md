@@ -3,6 +3,8 @@
 ## Symptoms
 connection pool exhausted after a sudden checkout traffic increase. Alert codes may include `ERR_POOL_EXHAUSTED`.
 
+Synthetic incident fingerprint: `INC_CHECKOUT_API_ERR_POOL_EXHAUSTED_001`.
+
 ## Root cause
 Cause: Increase in checkout-api database connection waiters exhausted the configured pool.
 

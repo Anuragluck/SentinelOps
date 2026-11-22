@@ -3,6 +3,8 @@
 ## Symptoms
 DNS NXDOMAIN service discovery failure. Alert codes may include `DNS_NXDOMAIN`.
 
+Synthetic incident fingerprint: `INC_CHECKOUT_API_DNS_NXDOMAIN_029`.
+
 ## Root cause
 Cause: The service discovery record was missing for the upstream endpoint.
 

@@ -3,6 +3,8 @@
 ## Symptoms
 worker OOMKilled memory pressure. Alert codes may include `OOM_KILLED`.
 
+Synthetic incident fingerprint: `INC_IDENTITY_API_OOM_KILLED_060`.
+
 ## Root cause
 Cause: A memory increase in the worker workload exceeded its container limit.
 

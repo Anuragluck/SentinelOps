@@ -3,6 +3,8 @@
 ## Symptoms
 high p95 latency elevated service metrics. Alert codes may include `HIGH_P95`.
 
+Synthetic incident fingerprint: `INC_CATALOG_API_HIGH_P95_063`.
+
 ## Root cause
 Cause: A saturated connection pool increased request queueing and p95 latency.
 

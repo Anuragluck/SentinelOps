@@ -3,6 +3,8 @@
 ## Symptoms
 TLS certificate expired handshake failures. Alert codes may include `CERT_EXPIRED`.
 
+Synthetic incident fingerprint: `INC_IDENTITY_API_CERT_EXPIRED_048`.
+
 ## Root cause
 Cause: The certificate renewal job failed and the active certificate expired.
 

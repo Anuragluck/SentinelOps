@@ -49,3 +49,20 @@ WHERE service = @service ORDER BY timestamp DESC LIMIT @limit"""
         bq.ScalarQueryParameter("limit", "INT64", limit),
     ])
     return [dict(row) for row in client.query(sql, job_config=config).result()]
+
+
+def recent_metrics(service: str, limit: int = 60) -> list[dict]:
+    if not 1 <= limit <= 500:
+        raise ValueError("limit outside allowed range")
+    bq, client = _client()
+    dataset = os.getenv("BIGQUERY_DATASET", "sentinelops")
+    if not re.fullmatch(r"[A-Za-z0-9_]+", dataset):
+        raise ValueError("BIGQUERY_DATASET must be a valid BigQuery dataset identifier")
+    sql = f"""SELECT timestamp, service, request_count, error_rate, p95_latency_ms
+FROM `{client.project}.{dataset}.service_metrics`
+WHERE service = @service ORDER BY timestamp DESC LIMIT @limit"""
+    config = bq.QueryJobConfig(query_parameters=[
+        bq.ScalarQueryParameter("service", "STRING", service),
+        bq.ScalarQueryParameter("limit", "INT64", limit),
+    ])
+    return [dict(row) for row in client.query(sql, job_config=config).result()]
