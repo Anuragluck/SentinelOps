@@ -21,6 +21,7 @@ def run_triage(alert: AlertInput) -> tuple[IncidentReport, str]:
     citations = [Citation(source_type="runbook", evidence_id=c.chunk_id,
                           excerpt=c.text[:500], uri=c.source) for c in evidence]
     telemetry_available = False
+    errors, deployments, metrics = [], [], []
     try:
         from src.tools.bigquery_tools import recent_deployments, recent_errors, recent_metrics
         if os.getenv("GOOGLE_CLOUD_PROJECT"):
