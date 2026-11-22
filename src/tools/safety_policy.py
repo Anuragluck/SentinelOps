@@ -1,7 +1,7 @@
 """Fail-closed deterministic command gate. LLM output never authorizes execution."""
-from dataclasses import dataclass
 import re
 import shlex
+from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -19,7 +19,7 @@ _DESTRUCTIVE = re.compile(
     re.IGNORECASE,
 )
 _SQL_MUTATION = re.compile(
-    r"\b(create|insert|update|delete|merge|drop|alter|truncate|call|export|load)\b", re.I
+    r"\b(create|insert|update|delete|merge|drop|alter|truncate|call|export|load)\b", re.IGNORECASE
 )
 
 
@@ -51,13 +51,11 @@ def _is_read_only(tokens: list[str]) -> bool:
     if executable == "curl":
         # Diagnostics may use GET/HEAD only and cannot write response data to disk.
         denied = {"-x", "--request", "-d", "--data", "-f", "--form", "-t", "--upload-file",
-                  "-o", "--output", "-o", "--remote-name"}
+                  "-o", "--output", "--remote-name"}
         if any(arg in denied for arg in args):
             return False
         return any(arg in {"-i", "-s", "-sS", "--head"} for arg in args)
-    if executable in {"journalctl", "grep", "cat", "tail", "head"}:
-        return True
-    return False
+    return executable in {"journalctl", "grep", "cat", "tail", "head"}
 
 
 def classify_command(command: str) -> Decision:

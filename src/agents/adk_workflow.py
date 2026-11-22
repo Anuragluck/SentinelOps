@@ -69,12 +69,12 @@ def build_root_agent():
     def collect_model_usage(callback_context, llm_response):
         usage = getattr(llm_response, "usage_metadata", None)
         if usage is None:
-            return None
+            return
         metrics = callback_context.state.setdefault("model_usage", {"input_tokens": 0, "output_tokens": 0, "calls": 0})
         metrics["input_tokens"] += int(getattr(usage, "prompt_token_count", 0) or 0)
         metrics["output_tokens"] += int(getattr(usage, "candidates_token_count", 0) or 0)
         metrics["calls"] += 1
-        return None
+        return
 
     def prune_tool_payload(tool, tool_args, tool_context, result):
         del tool, tool_args, tool_context
@@ -93,14 +93,14 @@ def build_root_agent():
 
     def inspect_telemetry(service: str, tool_context: ToolContext) -> str:
         """Query read-only BigQuery error, metric and deployment summaries."""
-        from src.tools.bigquery_tools import recent_deployments, recent_errors, recent_metrics
         from src.observability.state_pruner import prune_state
+        from src.tools.bigquery_tools import recent_deployments, recent_errors, recent_metrics
         result = {}
         for key, reader in (("errors", recent_errors), ("metrics", recent_metrics),
                             ("deployments", recent_deployments)):
             try:
                 result[key] = reader(service)
-            except Exception as exc:  # Cloud integration is optional and read-only.
+            except Exception as exc:  # noqa: BLE001 - keep optional cloud reads from failing triage.
                 result[key] = {"unavailable": type(exc).__name__}
         for section, rows in result.items():
             if isinstance(rows, list):

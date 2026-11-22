@@ -191,7 +191,7 @@ class HybridRetriever:
             return lexical[:limit]
         try:
             dense = self.vector_store.search(query, limit=max(limit * 3, limit))
-        except Exception:
+        except Exception:  # noqa: BLE001 - dense retrieval is optional; use lexical results on outage.
             # Lexical retrieval stays available if credentials or the vector database are down.
             return lexical[:limit]
         self.last_dense_used = bool(dense)

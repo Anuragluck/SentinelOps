@@ -37,9 +37,9 @@ def configure_tracing() -> bool:
         return False
     try:
         from opentelemetry import trace
+        from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
         from opentelemetry.sdk.resources import Resource
         from opentelemetry.sdk.trace import TracerProvider
-        from opentelemetry.exporter.cloud_trace import CloudTraceSpanExporter
         from opentelemetry.sdk.trace.export import BatchSpanProcessor
     except ImportError:
         return False

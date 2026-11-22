@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from enum import StrEnum
 import re
+from datetime import UTC, datetime
+from enum import StrEnum
 from typing import Any
 from uuid import uuid4
 
@@ -24,7 +24,7 @@ class AlertInput(BaseModel):
     summary: str = Field(min_length=1, max_length=4000)
     severity: Severity = Severity.UNKNOWN
     environment: str = Field(default="production", max_length=64)
-    started_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     labels: dict[str, str] = Field(default_factory=dict, max_length=50)
 
     @field_validator("service", "summary", "environment")
@@ -89,5 +89,5 @@ class TraceSummary(BaseModel):
 class TriageResponse(BaseModel):
     report: IncidentReport
     trace: TraceSummary
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = Field(default_factory=dict)

@@ -5,8 +5,8 @@ workflow returns an honest evidence summary instead of inventing a root cause.
 """
 from __future__ import annotations
 
-import os
 import json
+import os
 from uuid import uuid4
 
 from src.api.schemas import AlertInput, Citation, IncidentReport
@@ -38,7 +38,7 @@ def run_triage(alert: AlertInput) -> tuple[IncidentReport, str]:
                             excerpt=json.dumps(row, default=str, ensure_ascii=False)[:1000],
                             uri=f"bigquery:{os.getenv('BIGQUERY_DATASET', 'sentinelops')}.{source_type}",
                         ))
-    except Exception:
+    except Exception:  # noqa: BLE001 - BigQuery enrichment is optional; local evidence remains usable.
         errors, deployments, metrics = [], [], []
     # Only assert causes that appear in retrieved evidence. Generic output is explicit when absent.
     matched = [c for c in evidence if any(t in c.text.lower() for t in ("root cause", "cause:"))]

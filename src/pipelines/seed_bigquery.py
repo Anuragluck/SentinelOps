@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import random
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 
 def generate_rows(seed: int = 7, count: int = 500):
@@ -13,7 +13,7 @@ def generate_rows(seed: int = 7, count: int = 500):
     errors = []
     deployments = []
     metrics = []
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     for i in range(count):
         service = rng.choice(services)
         stamp = now - timedelta(minutes=rng.randint(0, 10080))

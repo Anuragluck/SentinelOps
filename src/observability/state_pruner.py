@@ -1,6 +1,6 @@
 """Bound tool output before it is copied into agent state."""
-from collections.abc import Mapping
 import json
+from collections.abc import Mapping
 
 
 def prune(value, max_chars: int = 6000):

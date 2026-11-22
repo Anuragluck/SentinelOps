@@ -1,7 +1,7 @@
 """Read-only telemetry queries; all user values are passed as BigQuery parameters."""
-from datetime import datetime, timedelta, timezone
 import os
 import re
+from datetime import UTC, datetime, timedelta
 
 
 def _client():
@@ -28,7 +28,7 @@ WHERE service = @service AND timestamp >= @cutoff
 ORDER BY timestamp DESC LIMIT @limit"""
     config = bq.QueryJobConfig(query_parameters=[
         bq.ScalarQueryParameter("service", "STRING", service),
-        bq.ScalarQueryParameter("cutoff", "TIMESTAMP", datetime.now(timezone.utc) - timedelta(minutes=since_minutes)),
+        bq.ScalarQueryParameter("cutoff", "TIMESTAMP", datetime.now(UTC) - timedelta(minutes=since_minutes)),
         bq.ScalarQueryParameter("limit", "INT64", limit),
     ])
     return [dict(row) for row in client.query(sql, job_config=config).result()]

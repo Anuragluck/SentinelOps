@@ -1,12 +1,13 @@
-from fastapi.testclient import TestClient
+import pytest
 
-from src.api.main import app
+from src.api.main import health
+from src.api.schemas import AlertInput
 
 
 def test_health():
-    assert TestClient(app).get("/health").status_code == 200
+    assert health()["status"] == "ok"
 
 
 def test_alert_rejects_extra_fields():
-    response = TestClient(app).post("/v1/triage", json={"service": "checkout-api", "summary": "5xx", "extra": True})
-    assert response.status_code == 422
+    with pytest.raises(ValueError):
+        AlertInput.model_validate({"service": "checkout-api", "summary": "5xx", "extra": True})

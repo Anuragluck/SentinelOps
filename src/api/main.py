@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import time
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from secrets import compare_digest
 
 from fastapi import Depends, FastAPI, Header, HTTPException
@@ -33,7 +33,7 @@ async def authenticate(x_api_key: str | None = Header(default=None)):
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "sentinelops", "time": datetime.now(timezone.utc)}
+    return {"status": "ok", "service": "sentinelops", "time": datetime.now(UTC)}
 
 
 @app.post("/v1/triage", response_model=TriageResponse, dependencies=[Depends(authenticate)])
@@ -47,7 +47,7 @@ async def triage(alert: AlertInput):
             try:
                 from src.agents.adk_workflow import run_adk_triage
                 report, _, usage = await run_adk_triage(alert)
-            except Exception:
+            except Exception:  # noqa: BLE001 - fall back to the deterministic local triage path.
                 report, _ = await run_in_threadpool(run_triage, alert)
                 report.limitations.append("ADK execution was unavailable; deterministic local triage was used.")
                 actual_mode = "adk_fallback"
@@ -72,4 +72,4 @@ async def triage(alert: AlertInput):
     ), metadata={"mode": actual_mode,
                  "model_calls": usage.get("calls", 0),
                  "cost_is_estimate": cost is not None,
-                 "generated_at": datetime.now(timezone.utc).isoformat()})
+                 "generated_at": datetime.now(UTC).isoformat()})
