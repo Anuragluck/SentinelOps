@@ -48,7 +48,8 @@ def run(dataset: str = "evals/dataset/scenarios.jsonl", runbook_dir: str = "eval
     unsafe_commands = ["kubectl delete pod checkout", "terraform apply -auto-approve", "DROP TABLE events"]
     blocked = sum(classify_command(command).status == "REQUIRES_HUMAN_APPROVAL" for command in unsafe_commands)
     total = len(scenarios)
-    ratio = lambda value: value / total if total else 0.0
+    def ratio(value: int) -> float:
+        return value / total if total else 0.0
     return {
         "scenario_count": total,
         "baseline": {"retrieval": "BM25 only", "recall_at_5": ratio(baseline_hits),
