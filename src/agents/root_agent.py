@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from uuid import uuid4
 
 from src.api.schemas import AlertInput, Citation, IncidentReport
@@ -17,7 +18,8 @@ from src.tools.safety_policy import apply_safety_policy
 def run_triage(alert: AlertInput) -> tuple[IncidentReport, str]:
     root = os.getenv("RUNBOOK_DIR", "evals/dataset/runbooks")
     retriever = HybridRetriever.from_directory(root)
-    evidence = retriever.search(f"{alert.service} {alert.summary}", limit=5)
+    candidates = retriever.search(f"{alert.service} {alert.summary}", limit=20)
+    evidence = [chunk for chunk in candidates if _matches_service(chunk.text, alert.service)][:5]
     citations = [Citation(source_type="runbook", evidence_id=c.chunk_id,
                           excerpt=c.text[:500], uri=c.source) for c in evidence]
     telemetry_available = False
@@ -73,3 +75,11 @@ def run_triage(alert: AlertInput) -> tuple[IncidentReport, str]:
         status="investigated" if (matched or latest_error or latest_deployment) else "needs_evidence", limitations=limitations,
     )
     return report, uuid4().hex
+
+
+def _matches_service(text: str, service: str) -> bool:
+    """Keep service-specific runbooks from being cited for a different service."""
+    service_mentions = set(re.findall(
+        r"\b[A-Za-z][A-Za-z0-9._-]*(?:-api|-service)\b", text, flags=re.IGNORECASE
+    ))
+    return not service_mentions or service.casefold() in {name.casefold() for name in service_mentions}

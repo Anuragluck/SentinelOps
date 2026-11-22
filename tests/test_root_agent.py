@@ -16,3 +16,4 @@ def test_triage_works_without_cloud_credentials(monkeypatch):
 
     assert report.service == "checkout-api"
     assert report.citations
+    assert all("checkout-api" in citation.excerpt for citation in report.citations)
